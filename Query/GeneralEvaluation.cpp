@@ -337,7 +337,6 @@ int GeneralEvaluation::combineBGPunfoldUnion(QueryTree::GroupPattern &group_patt
 		return 1;
 
 	// Combine BGP
-	// TODO: do we need to put all the BGP nodes on the left? (just push_back for now)
 	group_pattern.initPatternBlockid();
 	for (size_t i = 0; i < group_pattern.sub_group_pattern.size(); i++)
 	{
@@ -385,6 +384,21 @@ int GeneralEvaluation::combineBGPunfoldUnion(QueryTree::GroupPattern &group_patt
 	for (size_t i = 0; i < merged.size(); i++)
 		group_pattern.sub_group_pattern.erase(group_pattern.sub_group_pattern.begin() + merged[i] - i);
 
+	// Move all the BGP nodes to the left
+	merged.clear();
+	for (size_t i = 0; i < group_pattern.sub_group_pattern.size(); i++)
+	{
+		if (group_pattern.sub_group_pattern[i].type == QueryTree::GroupPattern::SubGroupPattern::BGP_type)
+		{
+			group_pattern.sub_group_pattern.insert(group_pattern.sub_group_pattern.begin() + merged.size(), \
+				group_pattern.sub_group_pattern[i]);
+			i++;
+			merged.push_back(i);
+		}
+	}
+	for (size_t i = 0; i < merged.size(); i++)
+		group_pattern.sub_group_pattern.erase(group_pattern.sub_group_pattern.begin() + merged[i] + (merged.size() - 1 - i));
+	
 	return 0;
 }
 
