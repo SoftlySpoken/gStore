@@ -3420,7 +3420,7 @@ int GeneralEvaluation::fillCandList(shared_ptr<BGPQuery> bgp_query, int dep, vec
 		}
 
 		/// If result_set is non-empty, set it as the current var's candidate list ///
-		if (!result_set.empty())
+		if (!result_set.empty() && result_set.size() < 1000000)
 		{
 			IDList result_vector;
 			result_vector.reserve(result_set.size());
