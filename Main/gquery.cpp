@@ -229,26 +229,30 @@ main(int argc, char * argv[])
 				}
 				rp += pos;
 
-				char *p = buf + strlen(buf) - 1;
+				// char *p = buf + strlen(buf) - 1;
+				char *p = strtok(buf, " ");
+				p = strtok(NULL, " ");
+				printf("buf = %s, p = %s\n", buf, p);
 				FILE *fp = stdout; ///default to output on screen
-				if (ifredirect)
-				{
-					char *tp = p;
-					while (*tp == ' ' || *tp == '\t')
-						tp--;
-					*(tp + 1) = '\0';
-					tp = rp + 1;
-					while (*tp == ' ' || *tp == '\t')
-						tp++;
-					fp = fopen(tp, "w"); //NOTICE:not judge here!
-					p = rp - 1;			 //NOTICE: all separated with ' ' or '\t'
-				}
-				while (*p == ' ' || *p == '\t') //set the end of path
-					p--;
-				*(p + 1) = '\0';
-				p = buf + 6;
-				while (*p == ' ' || *p == '\t') //acquire the start of path
-					p++;
+				
+				// if (ifredirect)
+				// {
+				// 	char *tp = p;
+				// 	while (*tp == ' ' || *tp == '\t')
+				// 		tp--;
+				// 	*(tp + 1) = '\0';
+				// 	tp = rp + 1;
+				// 	while (*tp == ' ' || *tp == '\t')
+				// 		tp++;
+				// 	fp = fopen(tp, "w"); //NOTICE:not judge here!
+				// 	p = rp - 1;			 //NOTICE: all separated with ' ' or '\t'
+				// }
+				// while (*p == ' ' || *p == '\t') //set the end of path
+				// 	p--;
+				// *(p + 1) = '\0';
+				// p = buf + 6;
+				// while (*p == ' ' || *p == '\t') //acquire the start of path
+				// 	p++;
 				//TODO: support the soft links(or hard links)
 				//there are also readlink and getcwd functions for help
 				//http://linux.die.net/man/2/readlink
@@ -284,7 +288,26 @@ main(int argc, char * argv[])
 		printf("%s\n\n", query.c_str());
 		ResultSet _rs;
 		//shared_ptr<Transaction> ptxn = make_shared<Transaction>(db_folder, 1, 1);
-		int ret = _db.query(query, _rs, fp, true, false, nullptr);
+
+		// p = p + strlen(p);
+		p = strtok(NULL, " ");
+		bool cp = true, tt = true;
+		if (p)
+		{
+			printf("p = %s\n", p);
+			if (strlen(p) > 0 && stoi(p) == 0)
+				cp = false;
+			p = strtok(NULL, " ");
+			if (p)
+			{
+				printf("p = %s\n", p);
+				if (strlen(p) > 0 && stoi(p) == 0)
+					tt = false;
+			}
+		}
+
+		printf("cp = %d, tt = %d\n", cp, tt);
+		int ret = _db.query(query, _rs, fp, true, false, nullptr, cp, tt);
 		//int ret = _db.query(query, _rs, NULL);
 		string msg;
 

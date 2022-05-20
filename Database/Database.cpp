@@ -1739,14 +1739,15 @@ Database::export_db(FILE* fp)
 }
 
 int
-Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool update_flag, bool export_flag, shared_ptr<Transaction> txn)
+Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool update_flag, bool export_flag, shared_ptr<Transaction> txn, \
+	bool cp, bool tt)
 {
 	string dictionary_store_path = this->store_path + "/dictionary.dc"; 	
 
 	this->stringindex->SetTrie(this->kvstore->getTrie());
 	GeneralEvaluation general_evaluation(this->kvstore, this->statistics, this->stringindex, this->query_cache, \
 		this->pre2num, this->pre2sub, this->pre2obj, this->triples_num, this->limitID_predicate, this->limitID_literal, \
-		this->limitID_entity, this->csr, txn);
+		this->limitID_entity, this->csr, txn, cp, tt);
 	if(txn != nullptr)
 	cout << "query in transaction............................................" << endl;
 	long tv_begin = Util::get_cur_time();
@@ -1971,15 +1972,15 @@ Database::query(const string _query, ResultSet& _result_set, FILE* _fp, bool upd
 	long tv_final = Util::get_cur_time();
 	cout << "Query time used (minus parsing): " << tv_final - tv_parse << "ms." << endl;
 	cout << "Total time used: " << (tv_final - tv_begin) << "ms." << endl;
+	long long ans_num = max((long long)_result_set.ansNum - _result_set.output_offset, 0LL);
+	if (_result_set.output_limit != -1)
+		ans_num = min(ans_num, (long long)_result_set.output_limit);
+	cout << "There has answer: " << ans_num << endl;
 	//if (general_evaluation.needOutputAnswer())
 	if(!export_flag)
 	{
 		if (need_output_answer)
 		{
-			long long ans_num = max((long long)_result_set.ansNum - _result_set.output_offset, 0LL);
-			if (_result_set.output_limit != -1)
-				ans_num = min(ans_num, (long long)_result_set.output_limit);
-			cout << "There has answer: " << ans_num << endl;
 			cout << "final result is : " << endl;
 			_result_set.output(_fp);
 			fprintf(_fp, "\n");

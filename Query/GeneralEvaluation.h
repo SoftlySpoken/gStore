@@ -55,6 +55,8 @@ class GeneralEvaluation
 		shared_ptr<Transaction> txn;
 
 		shared_ptr<BGPQuery> bgp_query_total;
+
+		bool cp, tt;	// Indicate whether the optimization is on
     public:
     	FILE* fp;
     	bool export_flag;
@@ -63,7 +65,8 @@ class GeneralEvaluation
 		GeneralEvaluation(KVstore *_kvstore, Statistics *_statistics, StringIndex *_stringindex, QueryCache *_query_cache, \
 			TYPE_TRIPLE_NUM *_pre2num,TYPE_TRIPLE_NUM *_pre2sub, TYPE_TRIPLE_NUM *_pre2obj, \
 			TYPE_TRIPLE_NUM _triples_num, TYPE_PREDICATE_ID _limitID_predicate, TYPE_ENTITY_LITERAL_ID _limitID_literal, \
-			TYPE_ENTITY_LITERAL_ID _limitID_entity, CSR *_csr, shared_ptr<Transaction> txn = nullptr);
+			TYPE_ENTITY_LITERAL_ID _limitID_entity, CSR *_csr, shared_ptr<Transaction> txn = nullptr, \
+			bool _cp = true, bool _tt = true);
 
 		~GeneralEvaluation();
 

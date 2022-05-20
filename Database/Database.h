@@ -55,7 +55,8 @@ public:
 	bool unload();
 	void clear();
 	void export_db(FILE* fp);
-	int query(const string _query, ResultSet& _result_set, FILE* _fp = stdout, bool update_flag = true, bool export_flag = false, shared_ptr<Transaction> txn = nullptr);
+	int query(const string _query, ResultSet& _result_set, FILE* _fp = stdout, bool update_flag = true, bool export_flag = false, shared_ptr<Transaction> txn = nullptr, \
+		bool cp = true, bool tt = true);
 	//1. if subject of _triple doesn't exist,
 	//then assign a new subid, and insert a new SigEntry
 	//2. assign new tuple_id to tuple, if predicate or object doesn't exist before too;

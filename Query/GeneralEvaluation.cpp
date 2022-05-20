@@ -116,10 +116,10 @@ void *preread_from_index(void *argv)
 GeneralEvaluation::GeneralEvaluation(KVstore *_kvstore, Statistics *_statistics, StringIndex *_stringindex, QueryCache *_query_cache, \
 	TYPE_TRIPLE_NUM *_pre2num,TYPE_TRIPLE_NUM *_pre2sub, TYPE_TRIPLE_NUM *_pre2obj, \
 	TYPE_TRIPLE_NUM _triples_num, TYPE_PREDICATE_ID _limitID_predicate, TYPE_ENTITY_LITERAL_ID _limitID_literal, \
-	TYPE_ENTITY_LITERAL_ID _limitID_entity, CSR *_csr, shared_ptr<Transaction> _txn):
+	TYPE_ENTITY_LITERAL_ID _limitID_entity, CSR *_csr, shared_ptr<Transaction> _txn, bool _cp, bool _tt):
 	kvstore(_kvstore), statistics(_statistics), stringindex(_stringindex), query_cache(_query_cache), pre2num(_pre2num), \
 	pre2sub(_pre2sub), pre2obj(_pre2obj), triples_num(_triples_num), limitID_predicate(_limitID_predicate), limitID_literal(_limitID_literal), \
-	limitID_entity(_limitID_entity), temp_result(NULL), fp(NULL), export_flag(false), csr(_csr), txn(_txn)
+	limitID_entity(_limitID_entity), temp_result(NULL), fp(NULL), export_flag(false), csr(_csr), txn(_txn), cp(_cp), tt(_tt)
 {
 	if (csr)
 		pqHandler = new PathQueryHandler(csr);
@@ -291,10 +291,13 @@ bool GeneralEvaluation::rewriteQuery()
 
 	Varset useful = this->query_tree.getResultProjectionVarset() + this->query_tree.getGroupByVarset() \
 				+ this->query_tree.getOrderByVarset();
-	highLevelOpt(query_tree.getGroupPattern(), useful);
+	if (tt)
+	{
+		highLevelOpt(query_tree.getGroupPattern(), useful);
+		printf("==========After highLevelOpt Query Tree==========\n");
+		query_tree.print();
+	}
 
-	printf("==========After highLevelOpt Query Tree==========\n");
-	query_tree.print();
 }
 
 int GeneralEvaluation::combineBGPunfoldUnion(QueryTree::GroupPattern &group_pattern)
@@ -1307,7 +1310,7 @@ TempResultSet* GeneralEvaluation::queryEvaluationAfterOpt(int dep)
 				if (curr_exist)
 				{
 					// Set candidate lists of common vars with the parent layer in rewriting_evaluation_stack //
-					if (dep > 0)
+					if (cp && dep > 0)
 					{
 						int fill_dep = fillCandList(bgp_query, dep, occur.vars);
 						if (fill_dep >= 0)
