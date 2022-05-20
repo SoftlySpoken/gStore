@@ -1263,6 +1263,7 @@ TempResultSet* GeneralEvaluation::queryEvaluationAfterOpt(int dep)
 			this->rewriting_evaluation_stack.push_back(EvaluationStackStruct());
 			this->rewriting_evaluation_stack.back().group_pattern = group_pattern.sub_group_pattern[i].group_pattern;
 			this->rewriting_evaluation_stack.back().result = NULL;
+			this->rewriting_evaluation_stack[dep].result = result;	// For GROUP fillCandList			
 			TempResultSet *temp = queryEvaluationAfterOpt(dep + 1);
 
 			if (result->results.empty())
@@ -1411,6 +1412,7 @@ TempResultSet* GeneralEvaluation::queryEvaluationAfterOpt(int dep)
 				this->rewriting_evaluation_stack.push_back(EvaluationStackStruct());
 				this->rewriting_evaluation_stack.back().group_pattern = group_pattern.sub_group_pattern[i].unions[j];
 				this->rewriting_evaluation_stack.back().result = NULL;
+				this->rewriting_evaluation_stack[dep].result = result;	// For UNION fillCandList
 				sub_result = queryEvaluationAfterOpt(dep + 1);
 				if (sub_result_outer->results.empty())
 				{
